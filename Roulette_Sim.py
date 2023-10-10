@@ -6,8 +6,12 @@ Created on Tue Oct 10 19:44:26 2023
 """
 
 import random
+import matplotlib.pyplot as plt 
 
 bankroll = int(input("What is your starting balance (in whole $$): "))
+Track_Profit = []
+simulation = input("Would you like to simulate this bet (Y/N):")
+
 
 
 def spins():
@@ -27,7 +31,7 @@ def spins():
     return result
 
 
-def bet_value(bet_type):50
+def bet_value(bet_type):
     if bet_type == 1:
         bet_val = int(input("Is it an EVEN (1) or an ODD (2) bet?: "))
         return bet_val
@@ -186,13 +190,18 @@ def adjusted_bankroll(result, balance, bet_val):
         else:
             prompt = "Loser! You now have $%s dollars!" % balance
 
-    global bankroll
+    global bankroll 
     bankroll = balance
+    Track_Profit.append(balance)
 
-    return (prompt, bankroll)
+    return (prompt, bankroll,Track_Profit)
 
 keep_playing = 'yes'
-while (keep_playing.lower() == 'yes') or (keep_playing.lower() == 'y'):
+
+
+if (simulation.lower() == 'yes') or (simulation.lower() == 'y'):
+    
+    num_sims = int(input("Please enter how many times you would like to simulate:"))
     bet = int(input("How much do you want to bet?: "))
     bet_type = int(input("What type of bet? Choose one of the given numbers:\n"
                          "1 = Even/Odd\n"
@@ -208,8 +217,43 @@ while (keep_playing.lower() == 'yes') or (keep_playing.lower() == 'y'):
                          "11 = Combination of Six Numbers\n"
                          "12 = Combination of 1-2-3-0-00\n"
                          "13 = One Number (Straight Up)"))
-    (prmpt, balance) = adjusted_bankroll(spins(), bankroll, bet_value(bet_type))
+    for i in range(num_sims):
+        (prmpt, balance,Track_Profit) = adjusted_bankroll(spins(), bankroll, bet_value(bet_type))
+        print("\nThe winning number is: %s!" % spins())
+        print(prmpt)
+        print("This is your tracked balance",Track_Profit)
+        bankroll = balance
+    x = range(num_sims)
+    plt.plot(x,Track_Profit) 
+    plt.ylabel("Balance")
+    plt.xlabel("Spins") 
+    plt.title("Roulette Simulation")  
+    plt.show() 
+    
+    
+        
+    
+else:
+    
+    while (keep_playing.lower() == 'yes') or (keep_playing.lower() == 'y'):
+        bet = int(input("How much do you want to bet?: "))
+        bet_type = int(input("What type of bet? Choose one of the given numbers:\n"
+                             "1 = Even/Odd\n"
+                             "2 = Red/Black\n"
+                             "3 = First Twelve (1-12)\n"
+                             "4 = Second Twelve (13-24)\n"
+                             "5 = Third Twelve (25-36)\n"
+                             "6 = First Eighteen (1-18)\n"
+                             "7 = Second Eighteen (19-36)\n"
+                             "8 = Combination of Two Numbers\n"
+                             "9 = Combination of Three Numbers\n"
+                             "10 = Combination of Four Numbers\n"
+                             "11 = Combination of Six Numbers\n"
+                             "12 = Combination of 1-2-3-0-00\n"
+                             "13 = One Number (Straight Up)"))
+    (prmpt, balance,Track_Profit) = adjusted_bankroll(spins(), bankroll, bet_value(bet_type))
     print("\nThe winning number is: %s!" % spins())
     print(prmpt)
+    print("This is your tracked balance",Track_Profit)
     bankroll = balance
     keep_playing = input("Would you like to keep playing? (Y/N): ")
