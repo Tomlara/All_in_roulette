@@ -7,9 +7,10 @@ Created on Tue Oct 10 19:44:26 2023
 
 import random
 import matplotlib.pyplot as plt 
+import numpy
 
 bankroll = int(input("What is your starting balance (in whole $$): "))
-Track_Profit = []
+Track_Profit = [bankroll]
 simulation = input("Would you like to simulate this bet (Y/N):")
 
 
@@ -88,7 +89,7 @@ def bet_value(bet_type):
         return bet_val
 
 
-def adjusted_bankroll(result, balance, bet_val):
+def adjusted_bankroll(result, balance, bet_type, bet_val, bet):
     balance -= bet
     # Adjust player balance for even/odd bets.
     if (bet_type == 1) and (bet_val == 1):  # Even
@@ -98,6 +99,7 @@ def adjusted_bankroll(result, balance, bet_val):
             prompt = "Winner! You now have $%s dollars!" % balance
         else:
             prompt = "Loser! You now have $%s dollars!" % balance
+    
     if (bet_type == 1) and (bet_val == 2):  # Odd
         if int(result) % 2 == 1:
             payout = bet
@@ -196,13 +198,8 @@ def adjusted_bankroll(result, balance, bet_val):
 
     return (prompt, bankroll,Track_Profit)
 
-keep_playing = 'yes'
-
-
-if (simulation.lower() == 'yes') or (simulation.lower() == 'y'):
+def Add_Bet_to_system(System):
     
-    num_sims = int(input("Please enter how many times you would like to simulate:"))
-    bet = int(input("How much do you want to bet?: "))
     bet_type = int(input("What type of bet? Choose one of the given numbers:\n"
                          "1 = Even/Odd\n"
                          "2 = Red/Black\n"
@@ -217,13 +214,44 @@ if (simulation.lower() == 'yes') or (simulation.lower() == 'y'):
                          "11 = Combination of Six Numbers\n"
                          "12 = Combination of 1-2-3-0-00\n"
                          "13 = One Number (Straight Up)"))
+    bet = int(input("How much do you want to bet each simuation for this bet choice?: "))
+    choice = bet_value(bet_type) 
+    System.append([bet_type,choice,bet])
+    keep_adding = input("Would you like to add to the ?: ")
+    return keep_adding,System
+
+
+keep_playing = 'yes'
+keep_adding = 'yes'
+
+
+if (simulation.lower() == 'yes') or (simulation.lower() == 'y'):
+    
+    num_sims = int(input("Please enter how many times you would like to simulate:"))
+    System = []
+    while (keep_adding.lower() == 'yes') or (keep_adding.lower() == 'y'):
+        keep_adding,System = Add_Bet_to_system(System)
+    
+    print(System)
+    print(range(len(System)))
+    
+    
     for i in range(num_sims):
-        (prmpt, balance,Track_Profit) = adjusted_bankroll(spins(), bankroll, bet_value(bet_type))
-        print("\nThe winning number is: %s!" % spins())
-        print(prmpt)
-        print("This is your tracked balance",Track_Profit)
-        bankroll = balance
-    x = range(num_sims)
+        Outcome = spins()
+        for j in range(len(System)):
+            (prmpt,balance,Track_Profit) = adjusted_bankroll(Outcome, bankroll, System[j][0], System[j][1], System[j][2])
+            print("\nThe winning number is: %s!" % Outcome)
+            print(prmpt)
+            print("This is your tracked balance",Track_Profit)
+    
+    Track_Profit = Track_Profit[0::len(System)]
+    print("This is tracked profit",Track_Profit)
+    
+    x = range(num_sims+1)
+    ar = numpy.array(x)
+    x =  ar + 1
+
+    print(x)
     plt.plot(x,Track_Profit) 
     plt.ylabel("Balance")
     plt.xlabel("Spins") 
@@ -236,7 +264,7 @@ if (simulation.lower() == 'yes') or (simulation.lower() == 'y'):
 else:
     
     while (keep_playing.lower() == 'yes') or (keep_playing.lower() == 'y'):
-        bet = int(input("How much do you want to bet?: "))
+        #bet = int(input("How much do you want to bet each simuation for this bet choice?: "))
         bet_type = int(input("What type of bet? Choose one of the given numbers:\n"
                              "1 = Even/Odd\n"
                              "2 = Red/Black\n"
@@ -251,6 +279,13 @@ else:
                              "11 = Combination of Six Numbers\n"
                              "12 = Combination of 1-2-3-0-00\n"
                              "13 = One Number (Straight Up)"))
+        #System = []
+        #System.append(bet_type)
+        bet = int(input("How much do you want to bet each simuation for this bet choice?: "))
+        System = []
+        System.append([bet_type,bet])
+        print(System)
+        
     (prmpt, balance,Track_Profit) = adjusted_bankroll(spins(), bankroll, bet_value(bet_type))
     print("\nThe winning number is: %s!" % spins())
     print(prmpt)
